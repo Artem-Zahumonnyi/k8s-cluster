@@ -24,10 +24,10 @@ locals {
 
 
 module "eks" {
-  create = local.create_eks ? 1 : 0
-
   source  = "terraform-aws-modules/eks/aws"
   version = "19.5.1"
+
+  create = local.create_eks ? 1 : 0
 
   cluster_name                   = local.cluster_name
   cluster_version                = local.cluster_version
@@ -167,10 +167,10 @@ module "eks" {
 }
 
 module "key_pair" {
-  create = local.create_eks ? 1 : 0
-
   source  = "terraform-aws-modules/key-pair/aws"
   version = "2.0.2"
+
+  create = local.create_eks ? 1 : 0
 
   key_name_prefix    = local.cluster_name
   create_private_key = true

@@ -41,20 +41,42 @@ variable "spot_instance_types" {
 }
 
 variable "spot_max_nodes_count" {
-  description = "The maximum size of the autoscaling group"
+  description = "The maximum size of the spot autoscaling group"
   type        = number
   default     = 1
 }
 
 variable "spot_desired_nodes_count" {
-  description = "The number of Amazon EC2 instances that should be running in the autoscaling group"
+  description = "The number of spot Amazon EC2 instances that should be running in the autoscaling group"
   type        = number
   default     = 1
 }
 
 variable "spot_min_nodes_count" {
-  description = "The minimum size of the autoscaling group"
+  description = "The minimum size of the spot autoscaling group"
   type        = number
+  default     = 1
+}
+
+// Variables for on-demand pool
+variable "demand_instance_types" {
+  description = "AWS instance type to build nodes for on-demand pool"
+  type        = list(any)
+  default     = [{ instance_type = "r5.xlarge" }]
+}
+
+variable "demand_max_nodes_count" {
+  description = "The maximum size of the on-demand autoscaling group"
+  default     = 1
+}
+
+variable "demand_desired_nodes_count" {
+  description = "The number of on-demand Amazon EC2 instances that should be running in the autoscaling group"
+  default     = 1
+}
+
+variable "demand_min_nodes_count" {
+  description = "The minimum size of the on-demand autoscaling group"
   default     = 1
 }
 

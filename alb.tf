@@ -2,16 +2,14 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "8.2.2"
 
-  create_lb = true
 
-  name            = "${local.cluster_name}-ingress-alb"
 
+  name = "${local.cluster_name}-ingress-alb"
+
+  vpc_id          = var.vpc_id
+  subnets         = var.public_subnets_id
   security_groups = var.infra_public_security_group_ids
   enable_http2    = false
-
-  subnets         = var.public_subnets_id
-  tags            = var.tags
-  vpc_id          = var.vpc_id
 
   http_tcp_listeners = [
     {
@@ -44,10 +42,12 @@ module "alb" {
       "health_check_matcher" = "404"
     },
   ]
-  idle_timeout  = 500
+  idle_timeout = 500
   access_logs = {
     bucket = "prod-s3-elb-logs-eu-central-1"
   }
+
+  tags = var.tags
 }
 
 module "route53" {
