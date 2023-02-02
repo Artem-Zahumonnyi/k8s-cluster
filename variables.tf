@@ -9,6 +9,21 @@ variable "cluster_version" {
   default     = "1.23"
 }
 
+variable "platform_name" {
+  description = "The name of the cluster that is used for tagging resources"
+  type        = string
+}
+
+variable "role_arn" {
+  description = "The AWS IAM role arn to assume for running terraform (e.g. arn:aws:iam::093899590031:role/EKSDeployerRole)"
+  type        = string
+}
+
+variable "platform_domain_name" {
+  description = "The name of existing DNS zone for platform"
+  type        = string
+}
+
 variable "vpc_id" {
   description = "ID of the VPC where the cluster security group will be provisioned"
   type        = string
@@ -16,6 +31,22 @@ variable "vpc_id" {
 
 variable "private_subnets_id" {
   description = "A list of subnet IDs where the nodes/node groups will be provisioned"
+  type        = list(any)
+}
+
+variable "public_subnets_id" {
+  description = "A list of subnets to place the LB and other external resources"
+  type        = list(any)
+}
+
+variable "ssl_policy" {
+  description = "Predefined SSL security policy for ALB https listeners"
+  type        = string
+  default     = "ELBSecurityPolicy-TLS-1-2-2017-01"
+}
+
+variable "infra_public_security_group_ids" {
+  description = "Security group IDs should be attached to external ALB"
   type        = list(any)
 }
 
@@ -104,4 +135,25 @@ variable "aws_auth_roles" {
 variable "tags" {
   description = "A map of tags to apply to all resources"
   type        = map(any)
+}
+
+# OIDC
+variable "client_id" {
+  description = "Client ID for the OpenID Connect identity provider."
+  type        = string
+}
+
+variable "identity_provider_config_name" {
+  description = "The name of the identity provider config."
+  type        = string
+}
+
+variable "issuer_url" {
+  description = "Issuer URL for the OpenID Connect identity provider."
+  type        = string
+}
+
+variable "groups_claim" {
+  description = "The JWT claim that the provider will use to return groups."
+  type        = string
 }

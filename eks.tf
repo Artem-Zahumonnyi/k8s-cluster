@@ -4,30 +4,16 @@ data "aws_security_group" "default" {
 }
 
 locals {
-  cluster_name              = "my-cluster"
+  cluster_name              = var.platform_name
   cluster_version           = var.cluster_version
   cluster_security_group_id = data.aws_security_group.default.id
-
-  aws_auth_roles = var.aws_auth_roles
-  aws_auth_users = var.aws_auth_users
-  tags = {
-    "SysName"      = "EPAM"
-    "SysOwner"     = "SpecialEPMD-EDPcoreteam@epam.com"
-    "Environment"  = "EKS-SANDBOX-CLUSTER"
-    "CostCenter"   = "2023"
-    "BusinessUnit" = "EDP"
-    "Department"   = "EPMD-EDP"
-    "user:tag"     = local.cluster_name
-  }
-  create_eks = false
 }
-
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.5.1"
+  version = "19.6.0"
 
-  create = local.create_eks ? 1 : 0
+  create = local.create_eks
 
   cluster_name                   = local.cluster_name
   cluster_version                = local.cluster_version
@@ -46,7 +32,7 @@ module "eks" {
   #  }
 
   vpc_id     = var.vpc_id
-  subnet_ids = [var.private_subnets_id[1]] #var.private_subnets_id
+  subnet_ids = var.private_subnets_id
 
   create_cloudwatch_log_group                = false
   cluster_enabled_log_types                  = []
@@ -64,7 +50,7 @@ module "eks" {
   self_managed_node_group_defaults = {
     instance_type              = "r5.large"
     post_bootstrap_user_data   = var.add_userdata
-    target_group_arns          = [] #module.alb.target_group_arns
+    target_group_arns          = module.alb.target_group_arns
     key_name                   = module.key_pair.key_pair_name
     enable_monitoring          = false
     use_mixed_instances_policy = true
@@ -160,17 +146,15 @@ module "eks" {
   # aws-auth configmap
   create_aws_auth_configmap = true
   manage_aws_auth_configmap = true
-  aws_auth_roles            = local.aws_auth_roles
-  aws_auth_users            = local.aws_auth_users
+  aws_auth_roles            = var.aws_auth_roles
+  aws_auth_users            = var.aws_auth_users
 
-  tags = var.tags
+  tags = local.tags
 }
 
 module "key_pair" {
   source  = "terraform-aws-modules/key-pair/aws"
   version = "2.0.2"
-
-  create = local.create_eks ? 1 : 0
 
   key_name_prefix    = local.cluster_name
   create_private_key = true

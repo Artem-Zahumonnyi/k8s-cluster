@@ -2,9 +2,9 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "8.2.2"
 
+  create_lb = local.create_alb
 
-
-  name = "${local.cluster_name}-ingress-alb"
+  name = "${var.platform_name}-ingress-alb"
 
   vpc_id          = var.vpc_id
   subnets         = var.public_subnets_id
@@ -35,6 +35,13 @@ module "alb" {
 
   target_groups = [
     {
+      "name"                 = "${var.platform_name}-infra-alb-http"
+      "backend_port"         = "32080"
+      "backend_protocol"     = "HTTP"
+      "deregistration_delay" = "20"
+      "health_check_matcher" = "404"
+    },
+    {
       "name"                 = "${var.platform_name}-infra-alb-https"
       "backend_port"         = "32443"
       "backend_protocol"     = "HTTPS"
@@ -47,10 +54,5 @@ module "alb" {
     bucket = "prod-s3-elb-logs-eu-central-1"
   }
 
-  tags = var.tags
-}
-
-module "route53" {
-  source  = "terraform-aws-modules/route53/aws"
-  version = "2.10.2"
+  tags = local.tags
 }
